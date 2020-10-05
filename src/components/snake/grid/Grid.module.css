@@ -1,0 +1,29 @@
+.snake-grid {
+  background: black;
+  margin: 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.grid-item {
+  margin: 1px;
+  height: 15px;
+  width : 15px;
+}
+
+.grid-item-food {
+  background: green;
+}
+
+.grid-item-snake {
+  background: black;
+}
+
+.grid-item-void {
+  background: white;
+}

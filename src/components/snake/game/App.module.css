@@ -1,0 +1,16 @@
+.app {
+  background-color: #77867F;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.app-button {
+  width: max-content;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #EEFCCE;
+}
