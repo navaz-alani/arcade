@@ -1,0 +1,40 @@
+.board {
+  width: min-content;
+  margin: 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+
+  -webkit-box-shadow: 0px 0px 15px 5px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    0px 0px 15px 5px rgba(50, 50, 50, 0.75);
+  box-shadow:         0px 0px 15px 5px rgba(50, 50, 50, 0.75);
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+}
+
+.grid-item {
+  height: 60px;
+  width: 60px;
+}
+
+.grid-item img {
+  height: 100%;
+  width: 100%;
+}
+
+.grid-item-focus {
+  -webkit-box-shadow: inset 0px 0px 5px 5px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    inset 0px 0px 5px 5px rgba(50, 50, 50, 0.75);
+  box-shadow:         inset 0px 0px 5px 5px rgba(50, 50, 50, 0.75);
+}
+
+.grid-item-black {
+  background-color: rgb(184, 139, 74);
+}
+
+.grid-item-white {
+  background-color: rgb(227, 193, 111);
+}
