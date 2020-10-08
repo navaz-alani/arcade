@@ -24,7 +24,7 @@ export const Connect4Grid: React.FC<Props> = ({ grid, turn, dispatch }) => {
               col.map((item: GridItem, r: number) => {
                 return (
                   <div key={`${c}-${r}`}
-                       className={`${styles["slide-out"]} ${styles["grid-item"]} ${styles[`grid-item-${item}`]}`}
+                       className={`${styles["grid-item"]} ${styles[`grid-item-${item}`]}`}
                   >
                   </div>
                 );

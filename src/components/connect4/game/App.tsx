@@ -1,7 +1,13 @@
 import React from "react";
 import styles from "./App.module.css";
 import { Connect4Grid } from "@components/connect4/grid/Grid";
-import { Grid, GridItem, GameState, Action, Player } from "components/connect4/share/types";
+import {
+  Grid,
+  GridItem,
+  GameState,
+  Action,
+  Player
+} from "components/connect4/share/types";
 
 const GRID_X: number = 7;
 const GRID_Y: number = 6;
@@ -31,6 +37,7 @@ interface DirVec {
   y: number;
 };
 
+// DO NOT CHANGE ORDER - directions paired as opposites for pair checks
 const DIRECTIONS: DirVec[] = new Array(
   { x: 0, y: -1 },  // UP
   { x: 0, y: 1 },   // DOWN
@@ -135,19 +142,18 @@ const Connect4Game: React.FC = () => {
                   : gs.error.message
               }
             </p>
-            <Connect4Grid turn={turn} grid={gs.grid} dispatch={dispatch} />
           </>
         :
           <div>
-            {gs.win.message}
-            <Connect4Grid turn={turn} grid={gs.grid} dispatch={dispatch} />
-            <button className={styles["app-button"]}
-                    onClick={() => dispatch("reset")}
-            >
-              Restart
-            </button>
+            <p>{gs.win.message}</p>
           </div>
       }
+      <Connect4Grid turn={turn} grid={gs.grid} dispatch={dispatch} />
+      <button className={styles["app-button"]}
+              onClick={() => dispatch("reset")}
+      >
+        Restart
+      </button>
     </div>
   );
 }
