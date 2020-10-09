@@ -71,6 +71,7 @@ export class Board {
   public isMovePlayed(): boolean { return this.movePlayed; }
   // get current player
   public getTurn(): Color { return this.turn; }
+  public getGrid(): Grid { return this.grid; }
 
   // returns whether the current player can focus on the piece at p
   private canFocus(p: Pos): boolean {
