@@ -16,14 +16,3 @@
   flex-direction: column;
   margin: 0.5rem;
 }
-
-.app-button {
-  width: max-content;
-  height: max-content;
-  margin: auto;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: rgb(58, 45, 50);
-  color: white;
-  font-size: 100%;
-}

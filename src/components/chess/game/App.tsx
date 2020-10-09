@@ -4,6 +4,7 @@ import styles from "./App.module.css";
 import { Color, GameState, Action } from "../share/types";
 import { Board } from "./logic";
 import Log from "./Log";
+import ControlPanel from "./ControlPanel";
 
 const InitialGameState = (): GameState => {
   return {
@@ -13,18 +14,14 @@ const InitialGameState = (): GameState => {
 
 const GameReducer = (s: GameState, action: Action): GameState => {
   if (action === "reset") return InitialGameState();
-  s.board.handleClick(action.pos);
+  else if (action === "undo" ) s.board.undo(false);
+  else if (action === "redo" ) s.board.undo(true);
+  else s.board.handleClick(action.pos);
   return { ...s };
 }
 
 const ChessGame: React.FC = () => {
   let [gs, dispatch] = React.useReducer(GameReducer, InitialGameState());
-
-  const resetGame = () => {
-    gs.board.isMovePlayed()       &&
-    confirm("Confirm game reset") &&
-    dispatch("reset");
-  }
 
   return (
     <>
@@ -33,12 +30,7 @@ const ChessGame: React.FC = () => {
         <div className={styles["app-main"]}>
           <p>Turn: {Color[gs.board.getTurn()]}</p>
           <ChessGrid board={gs.board} dispatch={dispatch} />
-          {/* control panel - TODO; make component */}
-          <button className={styles["app-button"]}
-                  onClick={resetGame}
-          >
-            Reset Game
-          </button>
+          <ControlPanel gs={gs} dispatch={dispatch} />
         </div>
         <Log moves={gs.board.getMoves()} />
       </div>

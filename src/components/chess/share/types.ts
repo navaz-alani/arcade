@@ -39,7 +39,7 @@ export interface GameState {
   board: Board;
 };
 
-export type Action = "reset" |
+export type Action = "reset" | "undo" | "redo" |
   // click on a piece to focus on it - highlight the movable positions
   {
     type: "click",

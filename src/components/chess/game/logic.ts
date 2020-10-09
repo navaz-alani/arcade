@@ -30,6 +30,7 @@ export class Board {
   private movePlayed: boolean;
   private turn: Color;
   private moves: Move[];
+  private undone: Move[];
 
   // populates grid to initial chess game setup
   public constructor() {
@@ -39,6 +40,8 @@ export class Board {
     this.movePlayed = false;
     this.turn = Color.White;
     this.moves = [];
+    this.undone = [];
+
     // initialize grid as empty first, then add pieces
     this.grid = new Array(Board.dim);
     for (let i = 0; i < Board.dim; ++i)
@@ -80,6 +83,21 @@ export class Board {
   public getTurn(): Color { return this.turn; }
   public getGrid(): Readonly<Grid> { return this.grid; }
   public getMoves(): Readonly<Move[]> { return this.moves; }
+
+  // undoes the last played move, or if redo is set, then it undoes an undo
+  public undo(redo: boolean) {
+    if (!redo && this.moves.length === 0 ||
+         redo && this.undone.length === 0) return;
+    let lastMove: Move = redo ? this.undone.pop() : this.moves.pop();
+    this.move(lastMove.to, lastMove.from, redo ? false : true);
+    this.grid[lastMove.to.row][lastMove.to.col] = lastMove.captured;
+    this.toggleTurn();
+    this.clearFocus();
+  }
+
+  private toggleTurn() {
+    this.turn = (this.turn === Color.Black) ? Color.White : Color.Black;
+  }
 
   // returns whether the current player can focus on the piece at p
   private canFocus(p: Pos): boolean {
@@ -161,17 +179,18 @@ export class Board {
     return focusPts;
   }
 
-  private move(p1: Pos, p2: Pos) {
+  private move(p1: Pos, p2: Pos, undo: boolean) {
     // log move
     let captured: GridItem = this.grid[p2.row][p2.col]
-    this.moves.push({
+    let m: Move = {
       from: p1,
       to: p2,
       captured: (captured === "void" || captured === "focus")
                   ? captured
                   : { ...captured },
       turn: this.turn,
-    });
+    }
+    undo ? this.undone.push(m) : this.moves.push(m);
     // perform move
     this.grid[p2.row][p2.col] = this.grid[p1.row][p1.col];
     this.grid[p1.row][p1.col] = "void";
@@ -193,7 +212,7 @@ export class Board {
       this.clearFocus();
       // move original focus piece to position p & change turn
       this.move(pos, p);
-      this.turn = (this.turn === Color.Black) ? Color.White : Color.Black;
+      this.toggleTurn();
       this.movePlayed = true;
     }
   }
