@@ -46,7 +46,7 @@ const ChessGrid: React.FC<Props> = ({ board, dispatch }) => {
       board.getGrid().map((row: GridItem[], r: number) => {
         return (
           <div key={r} className={styles["board-row"]}>
-          <p className={styles["row-name"]}>{r}</p>
+          <p className={styles["row-name"]}>{Board.dim - r}</p>
           {
             row.map((it: GridItem, c: number) => {
               let className: string = `${styles["grid-item"]}
@@ -72,7 +72,7 @@ const ChessGrid: React.FC<Props> = ({ board, dispatch }) => {
               );
             })
           }
-          <p className={styles["row-name"]}>{r}</p>
+          <p className={styles["row-name"]}>{Board.dim - r}</p>
           </div>
         );
         }

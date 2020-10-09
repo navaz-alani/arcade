@@ -2,6 +2,7 @@ import {
   Color,
   Grid,
   GridItem,
+  Move,
   PieceType,
   Pos,
   posEqual,
@@ -28,6 +29,7 @@ export class Board {
   private currPlayable: Pos[];
   private movePlayed: boolean;
   private turn: Color;
+  private moves: Move[];
 
   // populates grid to initial chess game setup
   public constructor() {
@@ -36,6 +38,7 @@ export class Board {
     this.currPlayable = new Array<Pos>();
     this.movePlayed = false;
     this.turn = Color.White;
+    this.moves = [];
     // initialize grid as empty first, then add pieces
     this.grid = new Array(Board.dim);
     for (let i = 0; i < Board.dim; ++i)
@@ -66,12 +69,17 @@ export class Board {
            0 <= p.col && p.col < Board.dim;
   }
 
+  static chessNotation(p: Pos): string {
+    return "abcdefgh"[p.col] + (Board.dim - p.row).toString();
+  }
+
   // Returns whether a move has been played or not (if the game state is same as
   // original)
   public isMovePlayed(): boolean { return this.movePlayed; }
-  // get current player
+  // accessors
   public getTurn(): Color { return this.turn; }
   public getGrid(): Readonly<Grid> { return this.grid; }
+  public getMoves(): Readonly<Move[]> { return this.moves; }
 
   // returns whether the current player can focus on the piece at p
   private canFocus(p: Pos): boolean {
@@ -154,8 +162,18 @@ export class Board {
   }
 
   private move(p1: Pos, p2: Pos) {
+    // log move
+    let captured: GridItem = this.grid[p2.row][p2.col]
+    this.moves.push({
+      from: p1,
+      to: p2,
+      captured: (captured === "void" || captured === "focus")
+                  ? captured
+                  : { ...captured },
+      turn: this.turn,
+    });
+    // perform move
     this.grid[p2.row][p2.col] = this.grid[p1.row][p1.col];
-    // TODO: handle capturing pieces
     this.grid[p1.row][p1.col] = "void";
   }
 

@@ -1,4 +1,4 @@
-import {Board} from "../game/logic";
+import { Board } from "../game/logic";
 
 export interface Pos {
   row: number;
@@ -46,3 +46,10 @@ export type Action = "reset" |
     piece: GridItem,
     pos: Pos,
   };
+
+export interface Move {
+  from: Pos;
+  to: Pos;
+  captured: GridItem;
+  turn: Color;
+};

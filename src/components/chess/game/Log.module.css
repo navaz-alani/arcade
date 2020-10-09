@@ -1,0 +1,12 @@
+.log-display {
+  width: 10rem;
+  height: 80vh;
+  overflow-y: scroll;
+  margin: 0 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-entry {
+  margin: 0.1rem auto;
+}

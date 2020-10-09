@@ -1,10 +1,20 @@
+.app-title {
+  text-align: center;
+}
+
 .app {
-  width: max-content;
+  width: 1.25max-content;
   margin: auto;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-evenly;
   text-align: center;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem;
 }
 
 .app-button {

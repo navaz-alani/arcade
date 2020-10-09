@@ -3,6 +3,7 @@ import ChessGrid from "../grid/Grid";
 import styles from "./App.module.css";
 import { Color, GameState, Action } from "../share/types";
 import { Board } from "./logic";
+import Log from "./Log";
 
 const InitialGameState = (): GameState => {
   return {
@@ -26,16 +27,22 @@ const ChessGame: React.FC = () => {
   }
 
   return (
-    <div className={styles["app"]}>
-      <h1>Chess</h1>
-      <p>Turn: {Color[gs.board.getTurn()]}</p>
-      <ChessGrid board={gs.board} dispatch={dispatch} />
-      <button className={styles["app-button"]}
-              onClick={resetGame}
-      >
-        Reset Game
-      </button>
-    </div>
+    <>
+      <h1 className={styles["app-title"]}>Chess</h1>
+      <div className={styles["app"]}>
+        <div className={styles["app-main"]}>
+          <p>Turn: {Color[gs.board.getTurn()]}</p>
+          <ChessGrid board={gs.board} dispatch={dispatch} />
+          {/* control panel - TODO; make component */}
+          <button className={styles["app-button"]}
+                  onClick={resetGame}
+          >
+            Reset Game
+          </button>
+        </div>
+        <Log moves={gs.board.getMoves()} />
+      </div>
+    </>
   );
 }
 
