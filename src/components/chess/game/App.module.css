@@ -1,0 +1,16 @@
+.app {
+  width: max-content;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.app-button {
+  width: max-content;
+  height: max-content;
+  margin: auto;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}

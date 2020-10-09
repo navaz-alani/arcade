@@ -23,14 +23,16 @@ const pieceSetup: PieceType[][] = [
 
 export class Board {
   static dim: number = 8;
-  grid: Grid;
-  currentFocus: Pos;
-  currPlayable: Pos[];
+  private grid: Grid;
+  private currentFocus: Pos;
+  private currPlayable: Pos[];
+  private movePlayed: boolean;
 
   // populates grid to initial chess game setup
   public constructor() {
     this.currentFocus = { row: -1, col: -1 };
     this.currPlayable = new Array<Pos>();
+    this.movePlayed = false;
     // initialize with empty grid
     this.grid = new Array(Board.dim);
     for (let i = 0; i < Board.dim; ++i)
@@ -54,6 +56,10 @@ export class Board {
       }
     }
   }
+
+  // Returns whether a move has been played or not (if the game state is same as
+  // original)
+  public isMovePlayed(): boolean { return this.movePlayed; }
 
   private toggleFocus(p: Pos) {
     if (!Board.isValidPos(p)) return;
@@ -152,6 +158,7 @@ export class Board {
       this.clearFocus();
       // move original focus piece to position p
       this.move(pos, p);
+      this.movePlayed = true;
     }
   }
 }
