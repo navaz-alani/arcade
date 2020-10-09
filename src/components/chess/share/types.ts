@@ -37,7 +37,6 @@ export type Grid = GridItem[][];
 
 export interface GameState {
   board: Board;
-  turn: Color;
 };
 
 export type Action = "reset" |

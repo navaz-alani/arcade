@@ -27,13 +27,16 @@ export class Board {
   private currentFocus: Pos;
   private currPlayable: Pos[];
   private movePlayed: boolean;
+  private turn: Color;
 
   // populates grid to initial chess game setup
   public constructor() {
+    // initialise instance attributes
     this.currentFocus = { row: -1, col: -1 };
     this.currPlayable = new Array<Pos>();
     this.movePlayed = false;
-    // initialize with empty grid
+    this.turn = Color.White;
+    // initialize grid as empty first, then add pieces
     this.grid = new Array(Board.dim);
     for (let i = 0; i < Board.dim; ++i)
       this.grid[i] = new Array(Board.dim).fill("void");
@@ -56,10 +59,27 @@ export class Board {
       }
     }
   }
+  //
+  // Checks that the given position is valid within the board.
+  static isValidPos(p: Pos): boolean {
+    return 0 <= p.row && p.row < Board.dim &&
+           0 <= p.col && p.col < Board.dim;
+  }
 
   // Returns whether a move has been played or not (if the game state is same as
   // original)
   public isMovePlayed(): boolean { return this.movePlayed; }
+  // get current player
+  public getTurn(): Color { return this.turn; }
+
+  // returns whether the current player can focus on the piece at p
+  private canFocus(p: Pos): boolean {
+    if (!Board.isValidPos(p)) return false;
+    let gi: GridItem = this.grid[p.row][p.col];
+    if (gi === "void" || gi === "focus") return true;
+    if (gi.color === this.turn) return true;
+    return false;
+  }
 
   private toggleFocus(p: Pos) {
     if (!Board.isValidPos(p)) return;
@@ -76,12 +96,6 @@ export class Board {
       this.toggleFocus(this.currPlayable[i]);
     this.currentFocus = { row: -1, col: -1 };
     this.currPlayable = [];
-  }
-
-  // Checks that the given position is valid within the board.
-  static isValidPos(p: Pos): boolean {
-    return 0 <= p.row && p.row < Board.dim &&
-           0 <= p.col && p.col < Board.dim;
   }
 
   // Checks if piece at p1 is playable on p2.
@@ -146,6 +160,8 @@ export class Board {
 
   public handleClick(p: Pos) {
     if (this.currentFocus.row === -1) {
+      // check if current player can focus on piece at position p
+      if (!this.canFocus(p)) return;
       this.currentFocus = p;
       this.currPlayable = this.focusOn(p);
       if (this.currPlayable.length === 0)
@@ -156,8 +172,9 @@ export class Board {
       // save original focus piece before clearing
       let pos: Pos = this.currentFocus;
       this.clearFocus();
-      // move original focus piece to position p
+      // move original focus piece to position p & change turn
       this.move(pos, p);
+      this.turn = (this.turn === Color.Black) ? Color.White : Color.Black;
       this.movePlayed = true;
     }
   }

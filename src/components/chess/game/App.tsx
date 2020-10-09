@@ -7,7 +7,6 @@ import { Board } from "./logic";
 const InitialGameState = (): GameState => {
   return {
     board: new Board(),
-    turn: Color.White,
   };
 }
 
@@ -21,15 +20,15 @@ const ChessGame: React.FC = () => {
   let [gs, dispatch] = React.useReducer(GameReducer, InitialGameState());
 
   const resetGame = () => {
-    if (gs.board.isMovePlayed())
-      if (confirm("Confirm game reset"))
-        dispatch("reset");
+    gs.board.isMovePlayed()       &&
+    confirm("Confirm game reset") &&
+    dispatch("reset");
   }
 
   return (
     <div className={styles["app"]}>
       <h1>Chess</h1>
-      <p>Turn: {Color[gs.turn]}</p>
+      <p>Turn: {Color[gs.board.getTurn()]}</p>
       <ChessGrid board={gs.board} dispatch={dispatch} />
       <button className={styles["app-button"]}
               onClick={resetGame}
