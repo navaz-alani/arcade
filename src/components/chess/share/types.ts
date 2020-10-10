@@ -26,7 +26,6 @@ export enum PieceType {
 export interface Piece {
   type: PieceType;
   color: Color;
-  position: Pos;
   // indicates if a piece is being focused on
   focus: boolean;
 };

@@ -3,6 +3,7 @@ import {
   Grid,
   GridItem,
   Move,
+  Piece,
   PieceType,
   Pos,
   posEqual,
@@ -56,7 +57,6 @@ export class Board {
           this.grid[r][c] = {
             type: setup[c],
             color: color,
-            position: { row: r, col: c },
             focus: false,
           };
       }
@@ -167,6 +167,9 @@ export class Board {
     let d: DirVec, ub: number, dMod: -1 | 1 = this.dirMod(p);
     for (let i = 0; i < dirs.length; ++i) {
       d = dirs[i]; ub = (d.rep) ? 8 : 1;
+      if (item.type === PieceType.Pawn &&
+          (p.row === ((item.color === Color.Black) ? 1 : Board.dim - 2)))
+        ub = 2;
       for (let i = 1; i <= ub; ++i) {
         let pos: Pos = {
           row: p.row + i*dMod*d.x,
