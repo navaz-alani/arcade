@@ -10,13 +10,11 @@ import {
 import { DirVec, moves, specialPawnCapture } from "./moves";
 
 const pieceSetup: PieceType[][] = [
-  // row 1 -> row closest to edge
-  [
+  [// row 1 -> row closest to edge
     PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
     PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook,
   ],
-  // row 2 -> row second closest to edge
-  [
+  [// row 2 -> row second closest to edge
     PieceType.Pawn, PieceType.Pawn, PieceType.Pawn, PieceType.Pawn,
     PieceType.Pawn, PieceType.Pawn, PieceType.Pawn, PieceType.Pawn,
   ]
@@ -29,8 +27,8 @@ export class Board {
   private currPlayable: Pos[];
   private movePlayed: boolean;
   private turn: Color;
-  private moves: Move[];
-  private undone: Move[];
+  private moveStack: Move[];
+  private undoStack: Move[];
 
   // populates grid to initial chess game setup
   public constructor() {
@@ -39,39 +37,39 @@ export class Board {
     this.currPlayable = new Array<Pos>();
     this.movePlayed = false;
     this.turn = Color.White;
-    this.moves = [];
-    this.undone = [];
+    this.moveStack = new Array<Move>();
+    this.undoStack = new Array<Move>();
 
     // initialize grid as empty first, then add pieces
     this.grid = new Array(Board.dim);
     for (let i = 0; i < Board.dim; ++i)
       this.grid[i] = new Array(Board.dim).fill("void");
     // Add pieces to grid for both sides/colors
-    let colors: Color[] = [ Color.Black, Color.White ];
+    let colors: Color[] = new Array<Color>(Color.Black, Color.White);
     for (let color of colors) {
       let [r1, r2] = (color === Color.Black)
         ? [ 0, 1 ]
         : [ Board.dim - 1, Board.dim - 2 ];
       for (let r of [r1, r2]) {
         let setup: PieceType[] = pieceSetup[(r === r1) ? 0 : 1];
-        for (let c = 0; c < Board.dim; ++c) {
+        for (let c = 0; c < Board.dim; ++c)
           this.grid[r][c] = {
             type: setup[c],
             color: color,
             position: { row: r, col: c },
             focus: false,
           };
-        }
       }
     }
   }
-  //
+
   // Checks that the given position is valid within the board.
   static isValidPos(p: Pos): boolean {
     return 0 <= p.row && p.row < Board.dim &&
            0 <= p.col && p.col < Board.dim;
   }
 
+  // convert position to algebraic chess notation
   static chessNotation(p: Pos): string {
     return "abcdefgh"[p.col] + (Board.dim - p.row).toString();
   }
@@ -82,13 +80,13 @@ export class Board {
   // accessors
   public getTurn(): Color { return this.turn; }
   public getGrid(): Readonly<Grid> { return this.grid; }
-  public getMoves(): Readonly<Move[]> { return this.moves; }
+  public getMoves(): Readonly<Move[]> { return this.moveStack; }
 
   // undoes the last played move, or if redo is set, then it undoes an undo
   public undo(redo: boolean) {
-    if (!redo && this.moves.length === 0 ||
-         redo && this.undone.length === 0) return;
-    let lastMove: Move = redo ? this.undone.pop() : this.moves.pop();
+    if (!redo && this.moveStack.length === 0 ||
+         redo && this.undoStack.length === 0) return;
+    let lastMove: Move = redo ? this.undoStack.pop() : this.moveStack.pop();
     this.move(lastMove.to, lastMove.from, redo ? false : true);
     this.grid[lastMove.to.row][lastMove.to.col] = lastMove.captured;
     this.toggleTurn();
@@ -103,11 +101,11 @@ export class Board {
   private canFocus(p: Pos): boolean {
     if (!Board.isValidPos(p)) return false;
     let gi: GridItem = this.grid[p.row][p.col];
-    if (gi === "void" || gi === "focus") return true;
-    if (gi.color === this.turn) return true;
+    if (gi === "void" || gi === "focus" || gi.color === this.turn) return true;
     return false;
   }
 
+  // toggles focus state of GridItem at position p
   private toggleFocus(p: Pos) {
     if (!Board.isValidPos(p)) return;
     let item: GridItem = this.grid[p.row][p.col];
@@ -118,6 +116,7 @@ export class Board {
     }
   }
 
+  // unfocuses currently focused pieces
   private clearFocus() {
     for (let i = 0; i < this.currPlayable.length; ++i)
       this.toggleFocus(this.currPlayable[i]);
@@ -157,7 +156,8 @@ export class Board {
     return !(item.color === this.turn);
   }
 
-  private getFocusPoints(p: Pos): Pos[] {
+  // returns positions which are playable by the piece on position p
+  private getPlayable(p: Pos): Pos[] {
     let pts: Pos[] = new Array<Pos>();
     let item: GridItem = this.grid[p.row][p.col];
     if (item === "void" || item === "focus") return pts;
@@ -193,12 +193,14 @@ export class Board {
   }
 
   private focusOn(p: Pos): Pos[] {
-    let focusPts: Pos[] = this.getFocusPoints(p);
+    let focusPts: Pos[] = this.getPlayable(p);
     for (let i = 0; i < focusPts.length; ++i)
       this.toggleFocus(focusPts[i]);
     return focusPts;
   }
 
+  // move GridItem at position p1 to p2 and log it. If undo is true, move is
+  // logged on the undoStack.
   private move(p1: Pos, p2: Pos, undo: boolean) {
     // log move
     let captured: GridItem = this.grid[p2.row][p2.col]
@@ -210,7 +212,7 @@ export class Board {
                   : { ...captured },
       turn: this.turn,
     }
-    undo ? this.undone.push(m) : this.moves.push(m);
+    undo ? this.undoStack.push(m) : this.moveStack.push(m);
     // perform move
     this.grid[p2.row][p2.col] = this.grid[p1.row][p1.col];
     this.grid[p1.row][p1.col] = "void";
@@ -222,7 +224,7 @@ export class Board {
       if (!this.canFocus(p)) return;
       this.currentFocus = p;
       this.currPlayable = this.focusOn(p);
-      if (this.currPlayable.length === 0)
+      if (this.currPlayable.length === 0) // no playable moves, so undo focus
         this.currentFocus = { row: -1, col: -1 };
     } else if (posEqual(this.currentFocus, p)) this.clearFocus();
 
