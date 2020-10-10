@@ -56,3 +56,8 @@ moves.set(PieceType.King, new Array<DirVec>(
   { x: -1, y: 0, rep: false },
 ));
 
+
+export const specialPawnCapture: Array<DirVec> = [
+  { x: -1, y: 1,  rep: true },
+  { x: -1, y: -1, rep: true },
+];

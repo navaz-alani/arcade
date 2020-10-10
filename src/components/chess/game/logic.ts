@@ -7,7 +7,7 @@ import {
   Pos,
   posEqual,
 } from "../share/types";
-import { DirVec, moves } from "./moves";
+import { DirVec, moves, specialPawnCapture } from "./moves";
 
 const pieceSetup: PieceType[][] = [
   // row 1 -> row closest to edge
@@ -129,11 +129,14 @@ export class Board {
   // Return "last-playable" indicates that p1 can be played on p2, but no other
   // positions in the direct direction vector leading from p1 to p2 will be
   // playable.
+  // TODO: add check if playing move will check own king
   private isPlayableOn(p1: Pos, p2: Pos): boolean | "last-playable" {
     let item1: GridItem = this.grid[p1.row][p1.col];
     let item2: GridItem = this.grid[p2.row][p2.col];
     if (item1 === "void" || item1 === "focus" ||
         item2 === "void" || item2 === "focus") return true;
+    // special case: pawn cannot capture in its normal movement vector
+    if (item1.type === PieceType.Pawn && p1.col - p2.col === 0) return false;
     return (item1.color !== item2.color) ? "last-playable" : false;
   }
 
@@ -146,17 +149,24 @@ export class Board {
     return -1;
   }
 
+  // returns whether GridItem at position p is capturable by current player
+  private isCapturable(p: Pos): boolean {
+    if (!Board.isValidPos(p)) return false;
+    let item: GridItem = this.grid[p.row][p.col];
+    if (item === "void" || item === "focus") return false;
+    return !(item.color === this.turn);
+  }
+
   private getFocusPoints(p: Pos): Pos[] {
     let pts: Pos[] = new Array<Pos>();
     let item: GridItem = this.grid[p.row][p.col];
     if (item === "void" || item === "focus") return pts;
     // check in piece's direction vectors and compute all positions it can go to
     let dirs: DirVec[] = moves.get(item.type);
-    let d: DirVec, ub: number, dMod: -1 | 1; // predeclared iteration vars
+    // predeclared iteration vars
+    let d: DirVec, ub: number, dMod: -1 | 1 = this.dirMod(p);
     for (let i = 0; i < dirs.length; ++i) {
-      d = dirs[i];
-      ub = (d.rep) ? 8 : 1;
-      dMod = this.dirMod(p);
+      d = dirs[i]; ub = (d.rep) ? 8 : 1;
       for (let i = 1; i <= ub; ++i) {
         let pos: Pos = {
           row: p.row + i*dMod*d.x,
@@ -169,6 +179,16 @@ export class Board {
         if (playable === "last-playable") break;
       }
     }
+    // special case for pawn captures
+    if (item.type === PieceType.Pawn)
+      for (let d of specialPawnCapture) {
+        let pos: Pos = {
+          row: p.row + dMod*d.x,
+          col: p.col + dMod*d.y
+        };
+        if (!Board.isValidPos(pos)) continue;
+        this.isCapturable(pos) && pts.push(pos);
+      }
     return pts;
   }
 
@@ -211,7 +231,7 @@ export class Board {
       let pos: Pos = this.currentFocus;
       this.clearFocus();
       // move original focus piece to position p & change turn
-      this.move(pos, p);
+      this.move(pos, p, false);
       this.toggleTurn();
       this.movePlayed = true;
     }
