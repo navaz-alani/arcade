@@ -30,9 +30,10 @@ const ControlPanel: React.FC<Props> = ({ gs, dispatch }) => {
   return (
     <div className={styles["controls"]}>
     {
-      controls.map((c: ControlButton) => {
+      controls.map((c: ControlButton, key: number) => {
         return (
-          <button className={styles["control-button"]}
+          <button key={key}
+                  className={styles["control-button"]}
                   onClick={c.handler}
           >
           {c.label}

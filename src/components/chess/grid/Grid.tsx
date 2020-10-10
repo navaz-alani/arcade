@@ -37,8 +37,8 @@ const ChessGrid: React.FC<Props> = ({ board, dispatch }) => {
     <div className={styles["board"]}>
     <div className={styles["col-names"]}>
     {
-      "abcdefgh".split("").map((colName: string) => {
-        return <p className={styles["col-name"]}>{colName}</p>
+      "abcdefgh".split("").map((colName: string, key: number) => {
+        return <p className={styles["col-name"]} key={key}>{colName}</p>
       })
     }
     </div>
@@ -80,8 +80,8 @@ const ChessGrid: React.FC<Props> = ({ board, dispatch }) => {
     }
     <div className={styles["col-names"]}>
     {
-      "abcdefgh".split("").map((colName: string) => {
-        return <p className={styles["col-name"]}>{colName}</p>
+      "abcdefgh".split("").map((colName: string, key: number) => {
+        return <p key={key} className={styles["col-name"]}>{colName}</p>
       })
     }
     </div>

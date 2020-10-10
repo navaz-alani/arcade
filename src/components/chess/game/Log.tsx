@@ -12,9 +12,9 @@ const Log: React.FC<Props> = ({ moves }) => {
     <div className={styles["log-display"]}>
     <h3>Game Log</h3>
     {
-      moves.map((m: Move) => {
+      moves.map((m: Move, key: number) => {
         return (
-          <p className={styles["log-entry"]}>
+          <p className={styles["log-entry"]} key={key}>
             {Color[m.turn]}:
               {Board.chessNotation(m.from)}-{Board.chessNotation(m.to)}
           </p>
