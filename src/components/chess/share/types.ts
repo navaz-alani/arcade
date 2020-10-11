@@ -46,9 +46,16 @@ export type Action = "reset" | "undo" | "redo" |
     pos: Pos,
   };
 
+export enum MoveType {
+  Normal,
+  EnPassant,
+  Castling,
+};
+
 export interface Move {
   from: Pos;
   to: Pos;
   captured: GridItem;
   turn: Color;
+  type: MoveType;
 };

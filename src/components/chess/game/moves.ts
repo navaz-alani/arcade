@@ -57,7 +57,12 @@ moves.set(PieceType.King, new Array<DirVec>(
 ));
 
 
-export const specialPawnCapture: Array<DirVec> = [
+export const normalPawnCapture: Array<DirVec> = [
   { x: -1, y: 1,  rep: true },
   { x: -1, y: -1, rep: true },
+];
+
+export const enPassantCapture: Array<DirVec> = [
+  { x: 0,  y: 1,  rep: true },
+  { x: 0,  y: -1, rep: true },
 ];

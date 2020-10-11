@@ -3,12 +3,12 @@ import {
   Grid,
   GridItem,
   Move,
-  Piece,
+  MoveType,
   PieceType,
   Pos,
   posEqual,
 } from "../share/types";
-import { DirVec, moves, specialPawnCapture } from "./moves";
+import { DirVec, enPassantCapture, moves, normalPawnCapture } from "./moves";
 
 const pieceSetup: PieceType[][] = [
   [// row 1 -> row closest to edge
@@ -151,9 +151,21 @@ export class Board {
   // returns whether GridItem at position p is capturable by current player
   private isCapturable(p: Pos): boolean {
     if (!Board.isValidPos(p)) return false;
-    let item: GridItem = this.grid[p.row][p.col];
+    const item: GridItem = this.grid[p.row][p.col];
     if (item === "void" || item === "focus") return false;
     return !(item.color === this.turn);
+  }
+
+  private isEnPassantCapturable(p: Pos): boolean {
+    if (!Board.isValidPos(p)) return false;
+    const item: GridItem = this.grid[p.row][p.col];
+    if (item === "void" || item === "focus" ||
+        item.type !== PieceType.Pawn || this.moveStack.length === 0)
+      return false;
+    let lastMove: Move = this.moveStack[this.moveStack.length - 1];
+    if (!posEqual(p, lastMove.to)) return false;
+    const dy: number = lastMove.from.row - lastMove.to.row;
+    return (dy === -2 || dy === 2);
   }
 
   // returns positions which are playable by the piece on position p
@@ -167,6 +179,7 @@ export class Board {
     let d: DirVec, ub: number, dMod: -1 | 1 = this.dirMod(p);
     for (let i = 0; i < dirs.length; ++i) {
       d = dirs[i]; ub = (d.rep) ? 8 : 1;
+      // special case: pawn can move 2 steps if first move
       if (item.type === PieceType.Pawn &&
           (p.row === ((item.color === Color.Black) ? 1 : Board.dim - 2)))
         ub = 2;
@@ -183,15 +196,22 @@ export class Board {
       }
     }
     // special case for pawn captures
-    if (item.type === PieceType.Pawn)
-      for (let d of specialPawnCapture) {
-        let pos: Pos = {
-          row: p.row + dMod*d.x,
-          col: p.col + dMod*d.y
-        };
+    if (item.type === PieceType.Pawn) {
+      for (let d of normalPawnCapture) {
+        let pos: Pos = { row: p.row + dMod*d.x, col: p.col + dMod*d.y };
         if (!Board.isValidPos(pos)) continue;
         this.isCapturable(pos) && pts.push(pos);
       }
+      // check for enpassant
+      for (let d of enPassantCapture) {
+        let pos: Pos = { row: p.row + dMod*d.x, col: p.col + dMod*d.y };
+        if (!Board.isValidPos(pos)) continue;
+        this.isEnPassantCapturable(pos) && pts.push({
+          row: pos.row - dMod,
+          col: pos.col,
+        });
+      }
+    }
     return pts;
   }
 
@@ -205,8 +225,13 @@ export class Board {
   // move GridItem at position p1 to p2 and log it. If undo is true, move is
   // logged on the undoStack.
   private move(p1: Pos, p2: Pos, undo: boolean) {
-    // log move
-    let captured: GridItem = this.grid[p2.row][p2.col]
+    let moveType: MoveType = MoveType.Normal;
+    const toMove: GridItem = this.grid[p1.row][p1.col]
+    const captured: GridItem = this.grid[p2.row][p2.col]
+    // check if move is enpassant
+    if (toMove !== "void" && toMove !== "focus" &&
+        toMove.type === PieceType.Pawn && captured === "void" &&
+        p1.col !== p2.col) moveType = MoveType.EnPassant;
     let m: Move = {
       from: p1,
       to: p2,
@@ -214,11 +239,21 @@ export class Board {
                   ? captured
                   : { ...captured },
       turn: this.turn,
+      type: moveType,
     }
+    // log move
     undo ? this.undoStack.push(m) : this.moveStack.push(m);
     // perform move
     this.grid[p2.row][p2.col] = this.grid[p1.row][p1.col];
     this.grid[p1.row][p1.col] = "void";
+    // handle capture for enpassant
+    if (moveType === MoveType.EnPassant)
+      if (undo) this.grid[p2.row][p1.col] = {
+          type: PieceType.Pawn,
+          color: this.turn,
+          focus: false,
+        }
+      else this.grid[p1.row][p2.col] = "void";
   }
 
   public handleClick(p: Pos) {
