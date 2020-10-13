@@ -30,6 +30,7 @@ export class Board {
   private turn: Color;
   private moveStack: Move[];
   private undoStack: Move[];
+  private selectionNeeded: boolean;
 
   // populates grid to initial chess game setup
   public constructor() {
@@ -40,6 +41,7 @@ export class Board {
     this.turn = Color.White;
     this.moveStack = new Array<Move>();
     this.undoStack = new Array<Move>();
+    this.selectionNeeded = null;
 
     // initialize grid as empty first, then add pieces
     this.grid = new Array(Board.dim);
@@ -81,6 +83,7 @@ export class Board {
   public getTurn(): Color { return this.turn; }
   public getGrid(): Readonly<Grid> { return this.grid; }
   public getMoves(): Readonly<Move[]> { return this.moveStack; }
+  public isSelectionNeeded(): boolean { return this.selectionNeeded; }
 
   // undoes the last played move, or if redo is set, then it undoes an undo
   public undo(redo: boolean) {
@@ -89,6 +92,12 @@ export class Board {
     let lastMove: Move = redo ? this.undoStack.pop() : this.moveStack.pop();
     this.move(lastMove.to, lastMove.from, redo ? false : true);
     this.grid[lastMove.to.row][lastMove.to.col] = lastMove.captured;
+    if (lastMove.types.includes(MoveType.Promotion))
+      this.grid[lastMove.from.row][lastMove.from.col] = {
+        type: PieceType.Pawn,
+        color: (this.turn === Color.Black) ? Color.White : Color.Black,
+        focus: false,
+      }
     this.toggleTurn();
     this.clearFocus();
   }
@@ -225,13 +234,19 @@ export class Board {
   // move GridItem at position p1 to p2 and log it. If undo is true, move is
   // logged on the undoStack.
   private move(p1: Pos, p2: Pos, undo: boolean) {
-    let moveType: MoveType = MoveType.Normal;
+    let moveTypes: MoveType[] = [ MoveType.Normal ];
     const toMove: GridItem = this.grid[p1.row][p1.col]
     const captured: GridItem = this.grid[p2.row][p2.col]
-    // check if move is enpassant
     if (toMove !== "void" && toMove !== "focus" &&
-        toMove.type === PieceType.Pawn && captured === "void" &&
-        p1.col !== p2.col) moveType = MoveType.EnPassant;
+        toMove.type === PieceType.Pawn) {
+      // check if move is enpassant
+      if (captured === "void" && p1.col !== p2.col )
+        moveTypes.push(MoveType.EnPassant);
+      // check if move is pawn promotion
+      if (p2.row === ((toMove.color === Color.Black) ? Board.dim - 1 : 0)) {
+        moveTypes.push(MoveType.Promotion);
+      }
+    }
     let m: Move = {
       from: p1,
       to: p2,
@@ -239,7 +254,7 @@ export class Board {
                   ? captured
                   : { ...captured },
       turn: this.turn,
-      type: moveType,
+      types: moveTypes,
     }
     // log move
     undo ? this.undoStack.push(m) : this.moveStack.push(m);
@@ -247,16 +262,33 @@ export class Board {
     this.grid[p2.row][p2.col] = this.grid[p1.row][p1.col];
     this.grid[p1.row][p1.col] = "void";
     // handle capture for enpassant
-    if (moveType === MoveType.EnPassant)
+    if (moveTypes.includes(MoveType.EnPassant)) {
       if (undo) this.grid[p2.row][p1.col] = {
-          type: PieceType.Pawn,
-          color: this.turn,
-          focus: false,
-        }
+        type: PieceType.Pawn,
+        color: this.turn,
+        focus: false,
+      }
       else this.grid[p1.row][p2.col] = "void";
+    }
+    // handle pawn promotion
+    if (moveTypes.includes(MoveType.Promotion) && !undo)
+      this.selectionNeeded = true;
+  }
+
+  // completes the pawn promotion sequence
+  public handleSelection(p: PieceType) {
+    const promotionMove: Move = this.moveStack[this.moveStack.length - 1];
+    let promoted: GridItem = this.grid[promotionMove.to.row][promotionMove.to.col];
+    if (promoted !== "void" && promoted !== "focus")
+      promoted.type = p;
+    this.selectionNeeded = false;
+    this.toggleTurn();
   }
 
   public handleClick(p: Pos) {
+    // if a piece selection is needed, don't do anything until that selection
+    // has been submitted
+    if (this.selectionNeeded) return;
     if (this.currentFocus.row === -1) {
       // check if current player can focus on piece at position p
       if (!this.canFocus(p)) return;
@@ -272,7 +304,7 @@ export class Board {
       this.clearFocus();
       // move original focus piece to position p & change turn
       this.move(pos, p, false);
-      this.toggleTurn();
+      !this.selectionNeeded && this.toggleTurn();
       this.movePlayed = true;
     }
   }

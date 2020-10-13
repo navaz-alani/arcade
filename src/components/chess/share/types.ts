@@ -44,18 +44,23 @@ export type Action = "reset" | "undo" | "redo" |
     type: "click",
     piece: GridItem,
     pos: Pos,
+  } |
+  {
+    type: "selection",
+    piece: PieceType,
   };
 
 export enum MoveType {
   Normal,
-  EnPassant,
-  Castling,
+  EnPassant, // special pawn cature
+  Castling,  // king, rook pair special move
+  Promotion, // pawn promotion move
 };
 
 export interface Move {
+  types: MoveType[];
   from: Pos;
   to: Pos;
   captured: GridItem;
   turn: Color;
-  type: MoveType;
 };

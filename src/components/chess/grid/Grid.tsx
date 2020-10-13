@@ -1,7 +1,8 @@
 import React from "react";
 import { Board } from "../game/logic";
-import { Action, Color, GridItem, PieceType } from "../share/types";
+import { Action, GridItem } from "../share/types";
 import styles from "./Grid.module.css";
+import { getAssetSrc } from "../share/utils";
 
 interface Props {
   board: Board;
@@ -9,27 +10,8 @@ interface Props {
 };
 
 // board is checkered in a way such that each player has white at bottom right
-const getColorClass = (r: number, c: number): string => {
+export const getColorClass = (r: number, c: number): string => {
   return ((r+c)%2 == 0) ? "grid-item-white" : "grid-item-black";
-}
-
-interface PieceSpec {
-  type: PieceType;
-  color: Color;
-}
-
-const getAssetSrc = (p: PieceSpec): string => {
-  let c: string = p.color === Color.White ? "l" : "d",
-      t: string;
-  switch (p.type) {
-    case PieceType.Pawn:   { t = "p"; break }
-    case PieceType.Rook:   { t = "r"; break }
-    case PieceType.Knight: { t = "n"; break }
-    case PieceType.Bishop: { t = "b"; break }
-    case PieceType.Queen:  { t = "q"; break }
-    case PieceType.King:   { t = "k"; break }
-  }
-  return `/chess_assets/${t}${c}t60.png`;
 }
 
 const ChessGrid: React.FC<Props> = ({ board, dispatch }) => {
