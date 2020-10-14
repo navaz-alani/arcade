@@ -1,13 +1,18 @@
 # arcade
 
+## About
+
 This project is a collection of games implemented in React + TS. It was an
 opportunity for me to learn Typescript and improve my skills in modern React
 (function components & hooks). Currently, the following have been completed,
-along with their paths.
+along with their paths (when served with the development server).
 
 * Snake (`/snake`)
 * Connect4 (`/connect4`)
 * Chess (`/chess`)
+* Pong (`/pong`)
+
+## Getting Started
 
 To play these games, clone the repo and execute the following commands:
 
