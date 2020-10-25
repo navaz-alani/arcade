@@ -1,3 +1,9 @@
+export interface Config {
+  rows: number;
+  cols: number;
+  mines: number;
+};
+
 export enum CellState {
   Uncovered,
   Covered,
@@ -19,7 +25,12 @@ export interface Pos {
 
 export type WinState = "win" | "loss" | "undetermined";
 
-export type Action = "reset" | {
-  type: "click" | "flag";
-  pos: Pos;
-};
+export type Action = "reset" |
+  {
+    type: "reset-config",
+    conf: Config;
+  } |
+  {
+    type: "click" | "flag";
+    pos: Pos;
+  };

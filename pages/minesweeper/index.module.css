@@ -1,0 +1,31 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-button {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.presets-panel {
+  text-align: center;
+  margin: 1rem;
+}
+
+.preset:hover {
+  text-decoration: underline;
+}
+
+.form {
+  display:grid;
+  grid-template-columns: max-content max-content;
+  grid-gap: 7px;
+  width: max-content;
+  margin: 0.5em;
+}
+
+.form-label       { text-align:right; }
+.form-label:after { content: ":"; }

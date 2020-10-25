@@ -76,8 +76,8 @@ export class MinesweeperGameState {
       let minesToAdd: number = this.mines;
       let randRow: number, randCol: number;
       while (minesToAdd != 0) {
-        randRow = Math.floor(Math.random() * this.cols);
-        randCol = Math.floor(Math.random() * this.rows);
+        randRow = Math.floor(Math.random() * this.rows);
+        randCol = Math.floor(Math.random() * this.cols);
         if (randRow == p.row && randCol == p.col) continue;
         this.grid[randRow][randCol].surrounding = -1;
         --minesToAdd;
@@ -88,10 +88,8 @@ export class MinesweeperGameState {
     } else this.computeNeighborStats(p);
     this.grid[p.row][p.col].state = CellState.Uncovered;
     this.grid[p.row][p.col].enabled = false;
-    ++this.uncovered;
-    if (this.uncovered == (this.rows * this.cols) - this.mines) {
+    if ((++this.uncovered + this.mines) === (this.rows * this.cols))
       this.ws = "win";
-    }
   }
 
   flag = (p: Pos) => {
