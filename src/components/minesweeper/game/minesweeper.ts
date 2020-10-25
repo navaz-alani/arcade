@@ -67,6 +67,23 @@ export class MinesweeperGameState {
     }
   }
 
+  uncoverZeros = (p: Pos) => {
+    if (!this.isValidPos(p) || this.grid[p.row][p.col].surrounding !== 0) return;
+    let neighbor: Pos = { row: 0, col : 0 };
+    for (let dx = -1; dx <= 1; ++dx) for (let dy = -1; dy <= 1; ++dy) {
+      neighbor.row = p.row + dx;
+      neighbor.col = p.col + dy;
+      if (!this.isValidPos(neighbor) || (dx == 0 && dy == 0)) continue;
+      if (this.grid[neighbor.row][neighbor.col].state !== CellState.Uncovered) {
+        this.grid[neighbor.row][neighbor.col].state = CellState.Uncovered;
+        ++this.uncovered;
+        // neighbor stats are not computed when mines are being assigned
+        this.computeNeighborStats(neighbor);
+        this.uncoverZeros(neighbor);
+      }
+    }
+  }
+
   handleClick = (p: Pos) => {
     if (!this.grid[p.row][p.col].enabled) return;
     else if (this.grid[p.row][p.col].state === CellState.Flag) return;
@@ -88,6 +105,8 @@ export class MinesweeperGameState {
     } else this.computeNeighborStats(p);
     this.grid[p.row][p.col].state = CellState.Uncovered;
     this.grid[p.row][p.col].enabled = false;
+    // recursively uncover zeros area if pos `p` has zero mines surrounding
+    this.grid[p.row][p.col].surrounding === 0 && this.uncoverZeros(p);
     if ((++this.uncovered + this.mines) === (this.rows * this.cols))
       this.ws = "win";
   }
