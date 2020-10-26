@@ -5,7 +5,7 @@ export enum BirdState {
 };
 
 export enum BirdColor {
-  Red,
+  Red = 0,
   Blue,
   Yellow,
 }
