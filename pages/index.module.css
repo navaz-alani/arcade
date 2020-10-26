@@ -1,0 +1,37 @@
+.home {
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.home h1 {
+  color: white;
+}
+
+.games-listing {
+  width: max-content;
+  margin: 0 auto;
+  display: inherit;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-listing {
+  width: 150px;
+  background-color: white;
+  padding: 0.5rem;
+  margin: 0.25rem;
+  border-radius: 0.5rem;
+  box-shadow:         0px 0px 7px 0px rgba(50, 50, 50, 0.75);
+}
+
+.game-listing:hover {
+  box-shadow:         0px 0px 15px 0px rgba(50, 50, 50, 0.75);
+}
+
+.game-listing a {
+  text-decoration: none;
+  color: black;
+}

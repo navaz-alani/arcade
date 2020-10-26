@@ -1,0 +1,37 @@
+.bird {
+  position: absolute;
+  height: 24px;
+  width: 34px;
+  left: 45px;
+  transition: top 0.1s ease-in;
+}
+
+.bird-blue-downflap {
+  background: url("/flappy_bird_assets/sprites/bluebird-downflap.png");
+}
+.bird-blue-midflap {
+  background: url("/flappy_bird_assets/sprites/bluebird-midflap.png");
+}
+.bird-blue-upflap {
+  background: url("/flappy_bird_assets/sprites/bluebird-upflap.png");
+}
+
+.bird-red-downflap {
+  background: url("/flappy_bird_assets/sprites/redbird-downflap.png");
+}
+.bird-red-midflap {
+  background: url("/flappy_bird_assets/sprites/redbird-midflap.png");
+}
+.bird-red-upflap {
+  background: url("/flappy_bird_assets/sprites/redbird-upflap.png");
+}
+
+.bird-yellow-downflap {
+  background: url("/flappy_bird_assets/sprites/yellowbird-downflap.png");
+}
+.bird-yellow-midflap {
+  background: url("/flappy_bird_assets/sprites/yellowbird-midflap.png");
+}
+.bird-yellow-upflap {
+  background: url("/flappy_bird_assets/sprites/yellowbird-upflap.png");
+}
