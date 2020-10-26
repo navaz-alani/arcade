@@ -7,6 +7,8 @@ interface Props {
 };
 
 const INIT_VEL: number = 150;
+const FALL_CONSTANT: number = 250;
+const FREQ: number = 100/1000;
 
 // generates the class name based on the state of the bird
 const getClassName = (state: BirdState, color: BirdColor): string => {
@@ -36,8 +38,6 @@ const Bird: FC<Props> = ({ birdColor }) => {
   }
 
   useEffect(() => {
-    const FALL_CONSTANT: number = 250;
-    const FREQ: number = 100/1000;
     const interval: NodeJS.Timeout = setInterval(() => {
       let diff: number = (clicked) ? Math.max(-1*vel, -50) : vel;
       setHeight(h => {
@@ -46,7 +46,12 @@ const Bird: FC<Props> = ({ birdColor }) => {
           : h + diff*FREQ;
         return (hNew > 512) ? 512 : hNew
       });
-      if (clicked) { setVel(INIT_VEL); setClicked(c => !c); setState(BirdState.Upflap); }
+      if (clicked) {
+        setVel(INIT_VEL);
+        setClicked(c => !c);
+        setState(BirdState.Upflap);
+        new Audio("/flappy_bird_assets/audio/wing.ogg").play();
+      }
       else { setVel(v => v + (FALL_CONSTANT*FREQ)); setState(BirdState.Downflap); };
     }, FREQ*1000);
     return () => clearInterval(interval);
