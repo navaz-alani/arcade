@@ -11,7 +11,6 @@ const Games: Game[] = [
   { href: "/chess", name: "Chess (in progress)" },
   { href: "/connect4", name: "Connect4" },
   { href: "/snake", name: "Snake" },
-  { href: "/pong", name: "Pong" },
   { href: "/minesweeper", name: "Minesweeper" },
   { href: "/flappy-bird", name: "Flappy Bird" },
 ];

@@ -122,21 +122,27 @@ const SnakeGame: React.FC = () => {
 
   // keyhoard handler callback
   const keyHandler = React.useCallback(( e: KeyboardEvent ): void => {
+    let matched: bool = false;
     switch ( e.key ) {
       case "ArrowDown": {
-        if (direction !== Direction.Up) setDirection( Direction.Down ); break;
+        if (direction !== Direction.Up) setDirection( Direction.Down );
+        matched = true; break;
       }
       case "ArrowUp": {
-        if (direction !== Direction.Down) setDirection( Direction.Up ); break;
+        if (direction !== Direction.Down) setDirection( Direction.Up );
+        matched = true; break;
       }
       case "ArrowLeft": {
-        if (direction !== Direction.Right) setDirection( Direction.Left ); break;
+        if (direction !== Direction.Right) setDirection( Direction.Left );
+        matched = true; break;
       }
       case "ArrowRight": {
-        if (direction !== Direction.Left) setDirection( Direction.Right ); break;
+        if (direction !== Direction.Left) setDirection( Direction.Right );
+        matched = true; break;
       }
       default:
     }
+    matched && e.preventDefault();
   }, [direction]);
 
   // add global hander for keypresses
